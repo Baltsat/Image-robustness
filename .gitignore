@@ -174,3 +174,18 @@ cython_debug/
 .pypirc
 
 code
+PROMPTS.md
+STAGES.md
+
+cake_64_patch.pt
+caltech256.zip
+result_dict_cake.pkl
+caltech256
+data
+zipfile.zip
+
+**/repomix-output.xml
+**/repomix-*.xml
+
+
+
