@@ -177,6 +177,9 @@ code
 PROMPTS.md
 STAGES.md
 
+# Отчётные документы для фонда (не входят в PR)
+docs/
+
 cake_64_patch.pt
 caltech256.zip
 result_dict_cake.pkl
