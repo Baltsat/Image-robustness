@@ -1,493 +1,496 @@
-# Image-robustness: План и отчет по исследованию устойчивости мультимодальных моделей
+# Image-robustness: adversarial robustness of multimodal models — research plan and reports
 
-## Содержание
+Adversarial attacks on multimodal LLMs (CLIP, LLaVA family), measured end to end: attack generation, Attack Success Rate, cross-implementation generalisation, validation on 200+ real social-media videos, and a token-probability method for detecting attacks.
 
--   [План и результаты по кварталам 2025](#roadmap2025)
--   [Основной ожидаемый результат](#mainresult)
--   [Риски и угрозы](#risks)
--   [Отчетность по первому этапу (Q1 2025)](#q1_2025_report)
--   [Отчетность по второму этапу (Q2 2025)](#q2_2025_report)
--   [Отчетность по третьему этапу (Q3 2025)](#q3_2025_report)
--   [Отчетность по четвёртому этапу (Q4 2025)](#q4_2025_report)
--   [Итоговая сводка](#summary)
+**Headline results:** ASR 7%–26.5% on LLaVA OneVision · 5 model architectures × 5 patch classes × 10 intensity levels · acc@1 46%–87%, acc@5 88%–100% · transition-score detection over a 37.11%–100.00% token-probability range.
 
----
+## Contents
 
-<h2 id="roadmap2025">План и ожидаемые результаты по кварталам 2025 года</h2>
-
-<details>
-<summary><strong>I квартал 2025: Анализ и подготовка</strong></summary>
-
-**Планируемая деятельность:**
-
--   Проведение обзора существующих методов adversarial-атак на мультимодальные модели, включая Universal Adversarial Perturbation (UAP).
--   Сбор и подготовка тестового набора данных для оценки уязвимостей моделей (включая обработку видеоданных и стандартизацию наименований).
--   Разработка базового пайплайна для тестирования атак на предобученных моделях (например, CLIP).
--   Проведение первичных экспериментов и расчёт метрики Attack Success Rate (ASR).
-
-**Ожидаемые результаты:**
-
--   Завершение анализа актуальных методов атак, включая UAP.
--   Формирование и подготовка датасета для тестирования.
--   Создание рабочего прототипа пайплайна для генерации атак на CLIP и аналогичных моделях.
--   Оценка эффективности стандартных атак с использованием ASR.
--   Подготовка предварительного отчёта с первыми наблюдениями.
-
-</details>
-
-<details>
-<summary><strong>II квартал 2025: Улучшение методологии и тестирование</strong></summary>
-
-**Планируемая деятельность:**
-
--   Улучшение методологии тестирования атак, включая автоматизацию экспериментов.
--   Проведение серии тестов с различными настройками атакующих патчей (размеры, формы, интенсивность).
--   Анализ полученных результатов и их интерпретация.
--   Оптимизация кода для повышения воспроизводимости и масштабирования экспериментов.
--   Подготовка отчётности и первичного материала для публикации.
-
-**Ожидаемые результаты:**
-
--   Определение ключевых параметров, влияющих на успешность атак.
--   Улучшение методики генерации атакующих патчей.
--   Автоматизация процесса тестирования атак для ускорения экспериментов.
--   Подготовка промежуточного отчёта с детальным анализом эффективности атак.
-
-</details>
-
-<details>
-<summary><strong>III квартал 2025: Оптимизация атак и исследование защит</strong></summary>
-
-**Планируемая деятельность:**
-
--   Оптимизация атакующих патчей для повышения их эффективности (увеличение ASR, сокращение времени генерации).
--   Анализ возможных стратегий защиты моделей от исследованных атак.
--   Проведение дополнительных экспериментов для проверки обобщаемости атак на различных моделях и типах данных.
--   Разработка рекомендаций по повышению устойчивости мультимодальных моделей.
-
-**Ожидаемые результаты:**
-
--   Разработка улучшенных атакующих патчей с высокой ASR.
--   Предложение базовых стратегий защиты моделей от атак.
--   Первичная валидация предложенных стратегий защиты.
--   Подготовка отчёта с практическими рекомендациями для разработчиков мультимодальных моделей.
-
-</details>
-
-<details>
-<summary><strong>IV квартал 2025: Валидация защит и финализация</strong></summary>
-
-**Планируемая деятельность:**
-
--   Тестирование предложенных стратегий защиты на реальных данных и различных моделях.
--   Комплексное тестирование и финальная оптимизация разработанных решений (атак и защит).
--   Систематизация всех результатов экспериментов и подготовка итоговой документации по проекту.
--   Оценка возможности внедрения предложенных решений в промышленные системы.
--   Подготовка научной публикации с итогами работы.
-
-**Ожидаемые результаты:**
-
--   Проведение финальной оценки устойчивости мультимодальных моделей к атакам и эффективности предложенных стратегий защиты.
--   Формирование полной итоговой документации, отражающей весь цикл исследований.
--   Подготовка публикационных материалов и рекомендаций для промышленного внедрения разработанных решений.
--   Подготовка и отправка научной статьи с результатами исследования.
-
-</details>
+-   [2025 roadmap and results by quarter](#roadmap2025)
+-   [Main expected outcome](#mainresult)
+-   [Risks and threats](#risks)
+-   [Stage 1 report (Q1 2025)](#q1_2025_report)
+-   [Stage 2 report (Q2 2025)](#q2_2025_report)
+-   [Stage 3 report (Q3 2025)](#q3_2025_report)
+-   [Stage 4 report (Q4 2025)](#q4_2025_report)
+-   [Summary](#summary)
 
 ---
 
-<h2 id="mainresult">Основной ожидаемый результат по окончанию первого года</h2>
-
--   **Разработка и тестирование** базового набора adversarial-атак на мультимодальные модели (включая UAP, атаки на CLIP).
--   **Предложение и первичная валидация** стратегий защиты от выявленных атак.
--   **Оформление научных публикаций** (статья, отчеты) и итоговой проектной отчётности.
--   Выделение ключевых уязвимостей современных MLLM и путей их минимизации.
--   **Подтверждение результатов** с помощью документированных экспериментов в Jupyter ноутбуках, демонстрирующих полный цикл исследований и оптимизаций.
-
----
-
-<h2 id="risks">Риски и угрозы отклонения от ожидаемых результатов</h2>
+<h2 id="roadmap2025">2025 roadmap and expected results by quarter</h2>
 
 <details>
-<summary><strong>Показать/скрыть риски и стратегии смягчения</strong></summary>
+<summary><strong>Q1 2025: analysis and preparation</strong></summary>
 
--   **Риск: Нехватка релевантных данных для тестирования.**
-    -   _Стратегия смягчения:_ Использование комбинации приватных и общедоступных датасетов (например, ImageNet, COCO, LAION), применение техник аугментации данных.
--   **Риск: Недостаточная эффективность разработанных атак (низкий ASR).**
-    -   _Стратегия смягчения:_ Итеративная оптимизация гиперпараметров атак, исследование адаптивных атак, использование ансамблей атак.
--   **Риск: Сложность интерпретации результатов и метрик.**
-    -   _Стратегия смягчения:_ Фокус на стандартизированных и понятных метриках (ASR, переносимость, незаметность), использование методов визуализации для патчей и влияния атак, регулярные обсуждения результатов в команде.
--   **Риск: Нехватка вычислительных ресурсов.**
-    -   _Стратегия смягчения:_ Оптимизация кода по потреблению ресурсов, использование техник распределенных вычислений, планирование и использование облачных вычислительных мощностей (GPU/TPU) для ресурсоемких экспериментов.
+**Planned activity:**
+
+-   Review existing adversarial-attack methods against multimodal models, including Universal Adversarial Perturbation (UAP).
+-   Collect and prepare a test dataset for evaluating model vulnerabilities (including video processing and filename standardisation).
+-   Build a baseline pipeline for testing attacks on pretrained models (e.g. CLIP).
+-   Run initial experiments and compute Attack Success Rate (ASR).
+
+**Expected results:**
+
+-   Completed analysis of current attack methods, including UAP.
+-   Assembled and prepared test dataset.
+-   Working prototype pipeline for generating attacks against CLIP and comparable models.
+-   Effectiveness of standard attacks measured via ASR.
+-   Preliminary report with first observations.
+
+</details>
+
+<details>
+<summary><strong>Q2 2025: methodology improvement and testing</strong></summary>
+
+**Planned activity:**
+
+-   Improve attack-testing methodology, including experiment automation.
+-   Run a series of tests across different attack-patch settings (size, shape, intensity).
+-   Analyse and interpret the results.
+-   Optimise the code for reproducibility and experiment scaling.
+-   Prepare reporting and initial material for publication.
+
+**Expected results:**
+
+-   Identification of the key parameters driving attack success.
+-   Improved methodology for generating attack patches.
+-   Automated attack-testing process for faster experiments.
+-   Interim report with a detailed analysis of attack effectiveness.
+
+</details>
+
+<details>
+<summary><strong>Q3 2025: attack optimisation and defence research</strong></summary>
+
+**Planned activity:**
+
+-   Optimise attack patches for higher effectiveness (higher ASR, shorter generation time).
+-   Analyse candidate strategies for defending models against the studied attacks.
+-   Run additional experiments to check how well attacks generalise across models and data types.
+-   Develop recommendations for improving multimodal model robustness.
+
+**Expected results:**
+
+-   Improved attack patches with high ASR.
+-   Proposed baseline defence strategies.
+-   Initial validation of the proposed defences.
+-   Report with practical recommendations for developers of multimodal models.
+
+</details>
+
+<details>
+<summary><strong>Q4 2025: defence validation and finalisation</strong></summary>
+
+**Planned activity:**
+
+-   Test the proposed defence strategies on real data and across different models.
+-   Comprehensive testing and final optimisation of both attacks and defences.
+-   Systematise all experimental results and prepare final project documentation.
+-   Assess the feasibility of deploying the proposed solutions in production systems.
+-   Prepare a scientific publication with the results.
+
+**Expected results:**
+
+-   Final assessment of multimodal model robustness and of the effectiveness of the proposed defences.
+-   Complete final documentation covering the full research cycle.
+-   Publication materials and recommendations for industrial adoption.
+-   Scientific paper prepared and submitted.
 
 </details>
 
 ---
 
-<h2 id="q1_2025_report">📑 Отчетность по первому этапу (Q1 2025)</h2>
+<h2 id="mainresult">Main expected outcome at the end of year one</h2>
 
-### Краткое содержание этапа
+-   **Development and testing** of a baseline set of adversarial attacks on multimodal models (including UAP and attacks on CLIP).
+-   **Proposal and initial validation** of defence strategies against the identified attacks.
+-   **Scientific publications** (paper, reports) and final project reporting.
+-   Identification of the key vulnerabilities of current MLLMs and of ways to reduce them.
+-   **Verification of results** through documented Jupyter notebooks demonstrating the full research and optimisation cycle.
 
--   **Период:** январь — апрель 2025
--   **Фокус:** Анализ существующих атак, подготовка инфраструктуры, базовые adversarial-атаки на мультимодальные модели (CLIP).
--   **Ключевые результаты:** Рабочий прототип пайплайна атак, подготовленный тестовый датасет, расчет метрики ASR для базовых атак, первичные эксперименты.
+---
+
+<h2 id="risks">Risks and threats to the expected results</h2>
 
 <details>
-<summary><strong>Описание проведенной работы</strong></summary>
+<summary><strong>Show/hide risks and mitigation strategies</strong></summary>
 
--   Изучены современные методы adversarial-атак и защит на мультимодальные модели (согласно обзору литературы).
--   Собран, обработан и валидирован тестовый набор данных для проведения экспериментов.
--   Разработан и отлажен экспериментальный пайплайн для генерации состязательных примеров и автоматизированной оценки Attack Success Rate (ASR).
+-   **Risk: not enough relevant data for testing.**
+    -   _Mitigation:_ combine private and public datasets (e.g. ImageNet, COCO, LAION) and apply data-augmentation techniques.
+-   **Risk: the developed attacks are not effective enough (low ASR).**
+    -   _Mitigation:_ iterative hyperparameter optimisation, research into adaptive attacks, use of attack ensembles.
+-   **Risk: results and metrics are hard to interpret.**
+    -   _Mitigation:_ focus on standardised, legible metrics (ASR, transferability, imperceptibility); visualise patches and attack effects; discuss results regularly with the team.
+-   **Risk: insufficient compute.**
+    -   _Mitigation:_ optimise code for resource use, apply distributed-computing techniques, plan and use cloud GPU/TPU capacity for heavy experiments.
+
+</details>
+
+---
+
+<h2 id="q1_2025_report">📑 Stage 1 report (Q1 2025)</h2>
+
+### Stage summary
+
+-   **Period:** January – April 2025
+-   **Focus:** analysis of existing attacks, infrastructure preparation, baseline adversarial attacks on multimodal models (CLIP).
+-   **Key results:** working prototype attack pipeline, prepared test dataset, ASR computed for baseline attacks, initial experiments.
+
+<details>
+<summary><strong>Work carried out</strong></summary>
+
+-   Studied current adversarial-attack and defence methods for multimodal models (per the literature review).
+-   Collected, processed and validated a test dataset for the experiments.
+-   Built and debugged an experimental pipeline for generating adversarial examples and automatically evaluating Attack Success Rate (ASR).
 
 </details>
 
 <details>
-<summary><strong>Исследование методов атак и защит (Обзор литературы)</strong></summary>
+<summary><strong>Survey of attack and defence methods (literature review)</strong></summary>
 
-**Актуальные методы атак:**
+**Current attack methods:**
 
--   **Patch/UAP/Physical:** Универсальные и таргетированные патчи остаются высокоэффективными. Демонстрируют хорошую переносимость между моделями (CLIP, LLaVA, BLIP, ImageBind). Физическая реализуемость подтверждена.
--   **Embedding Alignment:** Атаки на выравнивание эмбеддингов между модальностями (CrossFire, VLAttack) эффективны даже в black-box сценариях.
--   **Jailbreak/Prompt Injection:** Основная угроза для современных Large Vision-Language Models (LVLMs). Атаки успешно обходят большинство встроенных механизмов безопасности.
--   **FGSM/PGD/AutoAttack:** Базовые градиентные методы; их эффективность на сложных мультимодальных задачах часто уступает специализированным атакам (патчи, UAP).
--   **Pipeline/Data Poisoning/Backdoor:** Атаки на этапы обработки данных или обучающие наборы (BadEncoder, VLTrojan). Представляют долгосрочную угрозу, внедряя скрытые уязвимости.
+-   **Patch / UAP / physical:** universal and targeted patches remain highly effective. They transfer well between models (CLIP, LLaVA, BLIP, ImageBind), and physical realisability is confirmed.
+-   **Embedding alignment:** attacks on cross-modal embedding alignment (CrossFire, VLAttack) are effective even in black-box settings.
+-   **Jailbreak / prompt injection:** the principal threat to current Large Vision-Language Models (LVLMs). These attacks successfully bypass most built-in safety mechanisms.
+-   **FGSM / PGD / AutoAttack:** baseline gradient methods; on complex multimodal tasks they are often less effective than specialised attacks such as patches and UAP.
+-   **Pipeline / data poisoning / backdoor:** attacks on data-processing stages or training sets (BadEncoder, VLTrojan). A long-term threat that plants hidden vulnerabilities.
 
-**Современные методы защиты:**
+**Current defence methods:**
 
--   **Adversarial Training:** Повышает устойчивость к известным типам атак, но часто снижает общую производительность и уязвимо к новым, неизвестным атакам.
--   **Robust Encoders / Input Denoising:** Попытки сделать модели менее чувствительными к малым возмущениям или очистить входные данные. Эффективность ограничена против сильных атак.
--   **Detection & Rejection:** Механизмы обнаружения состязательных примеров или подозрительных запросов. Могут быть обойдены адаптивными атаками.
--   **Ensemble Methods:** Комбинирование нескольких моделей или защит. Усложняет атаку, но не гарантирует полной защиты.
+-   **Adversarial training:** improves robustness to known attack types, but often degrades overall performance and remains vulnerable to new, unseen attacks.
+-   **Robust encoders / input denoising:** attempts to make models less sensitive to small perturbations, or to clean the input. Limited effectiveness against strong attacks.
+-   **Detection and rejection:** mechanisms for spotting adversarial examples or suspicious queries. Can be bypassed by adaptive attacks.
+-   **Ensemble methods:** combining several models or defences. Raises the cost of an attack but does not guarantee protection.
 
-**Ключевой вывод из обзора:**
+**Key conclusion from the review:**
 
--   На текущий момент не существует универсальной защиты от всех типов adversarial-атак на MLLM. Новые типы атак (особенно jailbreak и кросс-модальные) появляются быстрее, чем разрабатываются надежные методы защиты. Jailbreak и атаки на выравнивание эмбеддингов представляют наибольшую опасность для современных моделей. Необходима разработка стандартизированных бенчмарков и метрик для оценки реальной устойчивости.
+-   There is currently no universal defence against all types of adversarial attack on MLLMs. New attack types — jailbreak and cross-modal ones especially — appear faster than reliable defences are developed. Jailbreak and embedding-alignment attacks pose the greatest danger to current models. Standardised benchmarks and metrics for measuring real robustness are needed.
 
 </details>
 
 <details>
-<summary><strong>Доказательная база и артефакты</strong></summary>
+<summary><strong>Evidence and artefacts</strong></summary>
 
--   Полный код пайплайна, обработка данных и результаты первичных экспериментов доступны в Jupyter ноутбуке:
+-   The full pipeline code, data processing and initial experimental results are available in a Jupyter notebook:
     -   **[main.ipynb](main.ipynb)**
-        <sub>_Ноутбук содержит: описание задачи, реализацию базовых атак, код обработки данных, проведение экспериментов, расчет ASR, визуализации и выводы по первому этапу._</sub>
+        <sub>_The notebook contains: problem statement, implementation of baseline attacks, data-processing code, experiment runs, ASR computation, visualisations and stage-one conclusions._</sub>
 
 </details>
 
-### Быстрая ссылка на основной результат этапа
+### Quick link to the main result of this stage
 
--   ▶️ [Открыть Jupyter ноутбук с экспериментами Q1 (main.ipynb)](main.ipynb)
+-   ▶️ [Open the Q1 experiments notebook (main.ipynb)](main.ipynb)
 
 <details>
-<summary><strong>Структура ноутбука main.ipynb</strong></summary>
+<summary><strong>Structure of main.ipynb</strong></summary>
 
--   **Введение:** Описание задачи и выбранной методологии для Q1.
--   **Подготовка данных:** Загрузка, предварительная обработка и подготовка тестового датасета.
--   **Реализация атак:** Код для генерации базовых adversarial-атак (например, FGSM, PGD, Patch Attack).
--   **Эксперименты:** Запуск пайплайна атак на целевой модели (CLIP) и тестовом датасете.
--   **Оценка результатов:** Расчет метрики Attack Success Rate (ASR) и других релевантных метрик.
--   **Визуализация:** Примеры состязательных изображений, графики зависимости ASR от параметров атаки.
--   **Выводы:** Краткие выводы по результатам экспериментов первого этапа.
+-   **Introduction:** problem statement and the methodology chosen for Q1.
+-   **Data preparation:** loading, preprocessing and preparation of the test dataset.
+-   **Attack implementation:** code for generating baseline adversarial attacks (e.g. FGSM, PGD, patch attack).
+-   **Experiments:** running the attack pipeline against the target model (CLIP) and the test dataset.
+-   **Evaluation:** computing Attack Success Rate (ASR) and other relevant metrics.
+-   **Visualisation:** examples of adversarial images, plots of ASR against attack parameters.
+-   **Conclusions:** short conclusions from the stage-one experiments.
 
 </details>
 
 ---
 
-<h2 id="q2_2025_report">📑 Отчетность по второму этапу (Q2 2025)</h2>
+<h2 id="q2_2025_report">📑 Stage 2 report (Q2 2025)</h2>
 
-### Краткое содержание этапа
+### Stage summary
 
--   **Период:** апрель — июнь 2025
--   **Фокус:** Улучшение методологии тестирования, автоматизация экспериментов и анализ эффективности атак на видеоданных.
--   **Ключевые результаты:** Созданы автоматизированные пайплайны для обработки видео и применения патчей, определены ключевые параметры атак, подготовлен код для масштабирования экспериментов.
+-   **Period:** April – June 2025
+-   **Focus:** improving the testing methodology, automating experiments, and analysing attack effectiveness on video data.
+-   **Key results:** automated pipelines for video processing and patch application, key attack parameters identified, code prepared for scaling experiments.
 
 <details>
-<summary><strong>Описание проведенной работы</strong></summary>
+<summary><strong>Work carried out</strong></summary>
 
-1.  **Улучшение методологии тестирования атак:**
+1.  **Improving the attack-testing methodology:**
 
-    -   Разработаны и реализованы функции для автоматического наложения атакующих патчей на видеопотоки. Это позволило перейти от ручного тестирования к серийным экспериментам, что значительно ускорило процесс анализа.
-    -   Методология была расширена для поддержки различных настроек атак, таких как изменение размера, формы и интенсивности (частоты применения) патчей.
+    -   Designed and implemented functions for automatically overlaying attack patches onto video streams. This moved the work from manual testing to batch experiments and substantially accelerated analysis.
+    -   Extended the methodology to support different attack settings such as patch size, shape and intensity (application frequency).
 
-2.  **Автоматизация и оптимизация экспериментов:**
+2.  **Automation and experiment optimisation:**
 
-    -   Создан пайплайн для автоматической обработки видео-датасетов (`for_video_fix_names.ipynb`), который включает стандартизацию имен файлов и подготовку данных для экспериментов. Это повысило воспроизводимость и упростило масштабирование тестов.
-    -   Разработан скрипт (`patch_video.ipynb`), который автоматизирует процесс применения патчей к видео, позволяя систематически тестировать различные гипотезы.
+    -   Built a pipeline for automatic processing of video datasets (`for_video_fix_names.ipynb`) covering filename standardisation and data preparation. This improved reproducibility and made tests easier to scale.
+    -   Developed a script (`patch_video.ipynb`) that automates patch application to video, allowing hypotheses to be tested systematically.
 
-3.  **Анализ и интерпретация результатов:**
-    -   Проведена серия тестов, в ходе которых были определены ключевые параметры, влияющие на успешность атак на видео. Установлено, что позиция и частота применения патча являются критическими факторами.
-    -   Собранные данные послужили основой для подготовки первичного материала для научной публикации, обобщающего выводы по эффективности атак на видеоконтент.
+3.  **Analysis and interpretation of results:**
+    -   Ran a series of tests that identified the key parameters driving attack success on video. Patch position and application frequency were established as critical factors.
+    -   The collected data formed the basis of the initial material for a scientific publication summarising the findings on attack effectiveness against video content.
 
 </details>
 
 <details>
-<summary><strong>Доказательная база и артефакты</strong></summary>
+<summary><strong>Evidence and artefacts</strong></summary>
 
--   **Автоматизация обработки видеоданных:**
+-   **Automated video-data processing:**
 
     -   **[for_video_fix_names.ipynb](for_video_fix_names.ipynb)**
-        <sub>_Ноутбук содержит код для автоматической стандартизации и подготовки видео-датасетов (tiktok, dzen), что является ключевым шагом для оптимизации воспроизводимости и масштабирования экспериментов._</sub>
+        <sub>_Code for automatically standardising and preparing video datasets (TikTok, Dzen) — a key step for reproducibility and experiment scaling._</sub>
     -   <img src="imgs/for_video_fix_names_1.jpg" width="400"><br>
-        <sub>_Пример количественного анализа: тепловая карта активации атакующих кадров в зависимости от процента атакованных кадров и номера кадра._</sub>
+        <sub>_Example of quantitative analysis: heatmap of attacked-frame activation against the percentage of attacked frames and the frame index._</sub>
 
--   **Автоматизация применения патчей к видео:**
+-   **Automated patch application to video:**
     -   **[patch_video.ipynb](patch_video.ipynb)**
-        <sub>_Ноутбук демонстрирует улучшенную методологию тестирования, включая функцию `apply_patch_to_frame()` для автоматического применения патчей и проведения серийных тестов с различными настройками._</sub>
+        <sub>_Demonstrates the improved testing methodology, including the `apply_patch_to_frame()` function for automatic patch application and batch tests across different settings._</sub>
     -   <img src="imgs/81681.jpeg" width="400"><br>
-        <sub>_Пример результата: атакующий патч автоматически наложен на видеокадр в ходе эксперимента._</sub>
+        <sub>_Example result: an attack patch automatically overlaid on a video frame during an experiment._</sub>
 
 </details>
 
-### Быстрая ссылка на основной результат этапа
+### Quick links to the main results of this stage
 
--   ▶️ [Открыть Jupyter ноутбук с автоматизацией обработки видео (for_video_fix_names.ipynb)](for_video_fix_names.ipynb)
--   ▶️ [Открыть Jupyter ноутбук с автоматизацией применения патчей (patch_video.ipynb)](patch_video.ipynb)
+-   ▶️ [Open the video-processing automation notebook (for_video_fix_names.ipynb)](for_video_fix_names.ipynb)
+-   ▶️ [Open the patch-application automation notebook (patch_video.ipynb)](patch_video.ipynb)
 
 ---
 
-<h2 id="q3_2025_report">📑 Отчетность по третьему этапу (Q3 2025)</h2>
+<h2 id="q3_2025_report">📑 Stage 3 report (Q3 2025)</h2>
 
-### Краткое содержание этапа
+### Stage summary
 
--   **Период:** июль — сентябрь 2025
--   **Фокус:** Оптимизация атакующих патчей для повышения эффективности, анализ обобщаемости атак на различных моделях и типах данных.
--   **Ключевые результаты:** Получены оптимизированные параметры атак с ASR до 26.5%, подтверждение обобщаемости на альтернативных реализациях моделей, валидация на реальном датасете из 200 видео.
+-   **Period:** July – September 2025
+-   **Focus:** optimising attack patches for higher effectiveness; analysing how well attacks generalise across models and data types.
+-   **Key results:** optimised attack parameters reaching ASR up to 26.5%, confirmed generalisation across alternative model implementations, validation on a real dataset of 200 videos.
 
 <details>
-<summary><strong>Описание проведенной работы</strong></summary>
+<summary><strong>Work carried out</strong></summary>
 
-1.  **Оптимизация атакующих патчей для LLaVA OneVision:**
+1.  **Optimising attack patches for LLaVA OneVision:**
 
-    -   Разработаны специализированные атаки для модели LLaVA OneVision, направленные на повышение эффективности адверсариальных воздействий на мультимодальные системы.
-    -   Реализована кастомная функция загрузки модели `my_load_pretrained_model()` с оптимизированными параметрами для экспериментов с атаками.
-    -   Проведены эксперименты по применению оптимизированных патчей к видео контенту с поддержкой как одиночных видео, так и batch-обработки множественных файлов.
-    -   Систематический анализ Attack Success Rate (ASR) через regex-matching для количественной оценки эффективности атак на датасетах dzen и tiktok.
+    -   Developed specialised attacks against LLaVA OneVision aimed at increasing adversarial effectiveness on multimodal systems.
+    -   Implemented a custom model-loading function `my_load_pretrained_model()` with parameters optimised for attack experiments.
+    -   Ran experiments applying optimised patches to video content, supporting both single videos and batch processing of multiple files.
+    -   Performed systematic Attack Success Rate (ASR) analysis via regex matching to quantify attack effectiveness on the Dzen and TikTok datasets.
 
-2.  **Тестирование обобщаемости атак на различных реализациях:**
+2.  **Testing attack generalisation across implementations:**
 
-    -   Проведено тестирование обобщаемости разработанных атак на альтернативной реализации LLaVA OneVision через HuggingFace API, что позволяет проверить независимость атак от конкретной имплементации модели.
-    -   Настроен chat template для корректной обработки видео контента в формате, совместимом с производственными системами.
-    -   Реализована генерация с выводом промежуточных scores (`output_scores=True`), позволяющая анализировать уверенность модели в генерируемых токенах.
-    -   Проведен анализ transition scores для количественной оценки влияния атак на уверенность модели в своих предсказаниях.
+    -   Tested the developed attacks against an alternative LLaVA OneVision implementation through the HuggingFace API, verifying that the attacks do not depend on a specific implementation.
+    -   Configured a chat template so video content is handled in a format compatible with production systems.
+    -   Implemented generation with intermediate scores (`output_scores=True`), allowing analysis of the model's confidence in the generated tokens.
+    -   Analysed transition scores to quantify how attacks affect the model's confidence in its own predictions.
 
-3.  **Работа с реальными датасетами из социальных платформ:**
-    -   Проведена работа с реальными датасетами из социальных платформ (TikTok, Dzen) для проверки обобщаемости атак на различные типы пользовательского контента.
-    -   Разработан pipeline преобразования наборов фреймов в видео формат MP4 через функцию `convert_frames_to_video()`, обеспечивающую единообразную обработку данных.
-    -   Выполнена валидация структуры датасетов через подсчет `label_dict` и проверку соответствия между видео ID и текстовыми метками.
-    -   Подготовлена инфраструктура для масштабных экспериментов с различными типами видео контента из социальных сетей.
+3.  **Working with real datasets from social platforms:**
+    -   Worked with real datasets from social platforms (TikTok, Dzen) to check generalisation across different types of user content.
+    -   Built a pipeline converting frame sets into MP4 video via `convert_frames_to_video()`, ensuring uniform data handling.
+    -   Validated dataset structure by counting `label_dict` entries and checking the correspondence between video IDs and text labels.
+    -   Prepared the infrastructure for large-scale experiments across different types of social-media video content.
 
 </details>
 
 <details>
-<summary><strong>Результаты этапа</strong></summary>
+<summary><strong>Stage results</strong></summary>
 
-**1. Оптимизация эффективности атак:**
+**1. Attack-effectiveness optimisation:**
 
--   Получены оптимизированные параметры атакующих патчей с измеренным Attack Success Rate (ASR) в диапазоне от **7% до 26.5%** в зависимости от конфигурации (параметр N от 1 до 10).
--   Разработана методология автоматического подсчета ASR для датасетов dzen и tiktok через regex-matching, позволяющая систематически оценивать успешность атак.
--   Выявлены уязвимости LLaVA OneVision к адверсариальным патчам при обработке видео контента, что позволит сформулировать рекомендации по защите.
+-   Obtained optimised attack-patch parameters with a measured Attack Success Rate (ASR) between **7% and 26.5%** depending on configuration (parameter N from 1 to 10).
+-   Developed a methodology for automatically computing ASR on the Dzen and TikTok datasets via regex matching, enabling systematic evaluation of attack success.
+-   Identified LLaVA OneVision vulnerabilities to adversarial patches when processing video content, which supports concrete defence recommendations.
 
-**2. Обобщаемость атак:**
+**2. Attack generalisation:**
 
--   Подтверждена обобщаемость атак при переходе от нативной реализации LLaVA к HuggingFace версии модели.
--   Получены метрики transition scores и вероятности генерации токенов (диапазон от **37.11% до 100.00%**), позволяющие анализировать уверенность модели в своих предсказаниях.
--   Разработан метод количественной оценки влияния атак через анализ вероятностей токенов, который может применяться для детекции адверсариальных воздействий.
--   Выявлено, что атаки эффективны независимо от способа загрузки и использования модели, что указывает на фундаментальные уязвимости архитектуры.
+-   Confirmed that attacks generalise when moving from the native LLaVA implementation to the HuggingFace version.
+-   Obtained transition scores and token-generation probabilities (range **37.11% to 100.00%**), enabling analysis of the model's confidence in its predictions.
+-   Developed a method for quantifying attack impact through token-probability analysis, which can be applied to detecting adversarial interference.
+-   Established that the attacks work regardless of how the model is loaded and used, indicating fundamental architectural vulnerabilities.
 
-**3. Кросс-платформенная валидация:**
+**3. Cross-platform validation:**
 
--   Успешно обработано **200 видео** из TikTok/Dzen датасетов, конвертированных из фреймов в единый формат MP4 с частотой 30 FPS.
--   Подтверждена применимость атак на разнообразный пользовательский контент из социальных сетей.
--   Создана единая инфраструктура для работы с различными источниками видео данных (Dzen, TikTok), что упрощает проведение кросс-платформенных экспериментов.
--   Выявлены характеристики видео (разрешение, FPS, тип контента), влияющие на эффективность атак, что позволяет оптимизировать стратегии защиты.
+-   Successfully processed **200 videos** from the TikTok/Dzen datasets, converted from frames into a single MP4 format at 30 FPS.
+-   Confirmed the applicability of the attacks to diverse user content from social networks.
+-   Identified the video characteristics (resolution, FPS, content type) that affect attack effectiveness, which supports optimising defence strategies.
 
-**Итоговые достижения:**
+**Overall achievements:**
 
-1. **Оптимизация атак:** Получен ASR до 26.5% через специализированные параметры для LLaVA OneVision
-2. **Обобщаемость:** Атаки работают независимо от реализации модели (нативная LLaVA vs HuggingFace)
-3. **Кросс-платформенность:** Подтверждена применимость на реальном контенте из социальных сетей (200 видео)
-4. **Метрики оценки:** Разработаны методы количественной оценки через transition scores и вероятности токенов (37.11-100%)
+1. **Attack optimisation:** ASR up to 26.5% via parameters specialised for LLaVA OneVision
+2. **Generalisation:** attacks work independently of the model implementation (native LLaVA vs HuggingFace)
+3. **Cross-platform reach:** applicability confirmed on real social-media content (200 videos)
+4. **Evaluation metrics:** methods developed for quantification via transition scores and token probabilities (37.11–100%)
 
 </details>
 
 <details>
-<summary><strong>Доказательная база и артефакты</strong></summary>
+<summary><strong>Evidence and artefacts</strong></summary>
 
--   **Специализированные атаки для LLaVA OneVision:**
+-   **Specialised attacks for LLaVA OneVision:**
 
     -   **[llava_onevision_attacks.ipynb](llava_onevision_attacks.ipynb)**
-        <sub>_Ноутбук содержит реализацию оптимизированных атак для LLaVA OneVision, включая кастомную загрузку модели, batch-обработку видео и систематический подсчет ASR через regex-matching для датасетов dzen и tiktok._</sub>
+        <sub>_Implementation of optimised attacks for LLaVA OneVision, including custom model loading, batch video processing and systematic ASR computation via regex matching for the Dzen and TikTok datasets._</sub>
 
--   **Тестирование обобщаемости через HuggingFace API:**
+-   **Generalisation testing through the HuggingFace API:**
 
     -   **[llava_hf_generalization.ipynb](llava_hf_generalization.ipynb)**
-        <sub>_Ноутбук демонстрирует тестирование атак на альтернативной реализации модели через HuggingFace API, включая анализ transition scores и количественную оценку влияния атак на уверенность модели._</sub>
+        <sub>_Testing the attacks against an alternative model implementation via the HuggingFace API, including transition-score analysis and quantification of the attacks' effect on model confidence._</sub>
 
--   **Работа с реальными датасетами из социальных сетей:**
+-   **Working with real social-media datasets:**
     -   **[video_datasets_conversion.ipynb](video_datasets_conversion.ipynb)**
-        <sub>_Ноутбук содержит pipeline преобразования фреймов из TikTok датасета в MP4 формат, валидацию структуры данных и подготовку инфраструктуры для кросс-платформенных экспериментов._</sub>
+        <sub>_Pipeline converting TikTok dataset frames into MP4, data-structure validation and preparation of the infrastructure for cross-platform experiments._</sub>
 
 </details>
 
-### Быстрая ссылка на основные результаты этапа
+### Quick links to the main results of this stage
 
--   ▶️ [Открыть ноутбук с оптимизированными атаками (llava_onevision_attacks.ipynb)](llava_onevision_attacks.ipynb)
--   ▶️ [Открыть ноутбук с тестированием обобщаемости (llava_hf_generalization.ipynb)](llava_hf_generalization.ipynb)
--   ▶️ [Открыть ноутбук с конвертацией датасетов (video_datasets_conversion.ipynb)](video_datasets_conversion.ipynb)
+-   ▶️ [Open the optimised-attacks notebook (llava_onevision_attacks.ipynb)](llava_onevision_attacks.ipynb)
+-   ▶️ [Open the generalisation-testing notebook (llava_hf_generalization.ipynb)](llava_hf_generalization.ipynb)
+-   ▶️ [Open the dataset-conversion notebook (video_datasets_conversion.ipynb)](video_datasets_conversion.ipynb)
 
 ---
 
-<h2 id="q4_2025_report">📑 Отчетность по четвёртому этапу (Q4 2025)</h2>
+<h2 id="q4_2025_report">📑 Stage 4 report (Q4 2025)</h2>
 
-### Краткое содержание этапа
+### Stage summary
 
--   **Период:** октябрь — декабрь 2025
--   **Фокус:** Комплексное тестирование, валидация защит на реальных данных, систематизация результатов, подготовка к публикации.
--   **Ключевые результаты:** ASR до 26.5%, тестирование на 5 архитектурах моделей, валидация на 200+ реальных видео, система анализа transition scores для детекции атак.
+-   **Period:** October – December 2025
+-   **Focus:** comprehensive testing, validation of defences on real data, systematisation of results, preparation for publication.
+-   **Key results:** ASR up to 26.5%, testing across 5 model architectures, validation on 200+ real videos, a transition-score system for attack detection.
 
 <details>
-<summary><strong>Описание проведенной работы</strong></summary>
+<summary><strong>Work carried out</strong></summary>
 
-1.  **Комплексное тестирование устойчивости моделей:**
+1.  **Comprehensive robustness testing:**
 
-    -   Проведено масштабное тестирование на семействе моделей LLaVA (v0, v1.5-7B, v1.5-13B, OneVision-0.5B, OneVision-7B) с использованием разработанных адверсариальных патчей.
-    -   Реализован расчёт Perplexity (PPY) для количественной оценки влияния атак на качество генерации текста моделями.
-    -   Вычислены метрики acc@1 (46%–87%) и acc@5 (88%–100%) для 5 классов адверсариальных патчей (cake, homer, unicorn, random, control).
+    -   Ran large-scale testing across the LLaVA family (v0, v1.5-7B, v1.5-13B, OneVision-0.5B, OneVision-7B) using the developed adversarial patches.
+    -   Implemented Perplexity (PPY) computation to quantify how attacks affect the quality of model-generated text.
+    -   Computed acc@1 (46%–87%) and acc@5 (88%–100%) for 5 classes of adversarial patch (cake, homer, unicorn, random, control).
 
-2.  **Валидация на реальных данных из социальных сетей:**
+2.  **Validation on real social-media data:**
 
-    -   Обработано более 200 видеороликов из платформ TikTok и Dzen с применением автоматизированного пайплайна.
-    -   Протестированы 10 конфигураций масок атакованных кадров (от 10% до 100%).
-    -   Подтверждена практическая применимость атак на разнообразном пользовательском контенте.
+    -   Processed over 200 videos from TikTok and Dzen through the automated pipeline.
+    -   Tested 10 configurations of attacked-frame masks (from 10% to 100%).
+    -   Confirmed the practical applicability of the attacks across diverse user content.
 
-3.  **Разработка методологии детекции атак:**
+3.  **Developing an attack-detection methodology:**
 
-    -   Реализован анализ transition scores (вероятности токенов) в диапазоне 37.11%–100.00%.
-    -   Выявлена зависимость вероятностей целевых токенов от доли атакованных кадров.
-    -   Предложен метод детекции адверсариальных воздействий на основе аномалий в распределении вероятностей.
+    -   Implemented transition-score (token-probability) analysis over the 37.11%–100.00% range.
+    -   Identified the dependence of target-token probabilities on the share of attacked frames.
+    -   Proposed a method for detecting adversarial interference based on anomalies in the probability distribution.
 
-4.  **Систематизация и подготовка публикации:**
-    -   Собрана полная документация по 4 кварталам исследования.
-    -   Подготовлена презентация "Multimodal Attacks" с визуализацией результатов.
-    -   Обеспечена воспроизводимость всех экспериментов через документированные Jupyter ноутбуки.
+4.  **Systematisation and publication preparation:**
+    -   Assembled complete documentation across the four quarters of research.
+    -   Prepared a "Multimodal Attacks" presentation visualising the results.
+    -   Ensured reproducibility of all experiments through documented Jupyter notebooks.
 
 </details>
 
 <details>
-<summary><strong>Результаты этапа</strong></summary>
+<summary><strong>Stage results</strong></summary>
 
-**1. Количественные метрики устойчивости:**
+**1. Quantitative robustness metrics:**
 
--   **Attack Success Rate (ASR):** 7%–26.5% в зависимости от параметра N (1–10)
--   **Perplexity:** систематизированы значения для чистых и атакованных изображений
--   **Accuracy:** acc@1 от 46% до 87%, acc@5 от 88% до 100%
--   **Охват:** 5 архитектур моделей × 5 классов патчей × 10 уровней интенсивности
+-   **Attack Success Rate (ASR):** 7%–26.5% depending on parameter N (1–10)
+-   **Perplexity:** values systematised for clean and attacked images
+-   **Accuracy:** acc@1 from 46% to 87%, acc@5 from 88% to 100%
+-   **Coverage:** 5 model architectures × 5 patch classes × 10 intensity levels
 
-**2. Валидация на реальных данных:**
+**2. Validation on real data:**
 
--   200+ видеороликов из TikTok/Dzen обработаны автоматизированным пайплайном
--   Подтверждена эффективность атак на контенте из социальных сетей
--   Выявлены характеристики видео, влияющие на успешность атак
+-   200+ videos from TikTok/Dzen processed through the automated pipeline
+-   Attack effectiveness confirmed on social-media content
+-   Video characteristics affecting attack success identified
 
-**3. Система детекции через transition scores:**
+**3. Detection system based on transition scores:**
 
--   Диапазон вероятностей: 37.11%–100.00% для отдельных токенов
--   Метод применим для детекции аномального поведения модели
--   Графики зависимости вероятностей от доли атакованных кадров
+-   Probability range: 37.11%–100.00% for individual tokens
+-   The method is applicable to detecting anomalous model behaviour
+-   Plots of probability against the share of attacked frames
 
-**4. Итоговая документация:**
+**4. Final documentation:**
 
--   Презентация результатов (PDF)
--   4 документированных Jupyter ноутбука
--   Полный README с описанием методологии
+-   Results presentation (PDF)
+-   4 documented Jupyter notebooks
+-   Full README describing the methodology
 
 </details>
 
 <details>
-<summary><strong>Доказательная база и артефакты</strong></summary>
+<summary><strong>Evidence and artefacts</strong></summary>
 
--   **Комплексное тестирование и расчёт метрик:**
+-   **Comprehensive testing and metric computation:**
 
     -   **[llava_ppy_comprehensive_testing.ipynb](llava_ppy_comprehensive_testing.ipynb)**
-        <sub>_Ноутбук содержит: расчёт Perplexity для LLaVA v0/v1.5, метрики acc@1 и acc@5, визуализацию результатов для 5 классов патчей, сравнение чистых и атакованных изображений._</sub>
+        <sub>_Contains: Perplexity computation for LLaVA v0/v1.5, acc@1 and acc@5 metrics, result visualisation for 5 patch classes, comparison of clean and attacked images._</sub>
 
--   **Анализ вероятностей токенов (transition scores):**
+-   **Token-probability analysis (transition scores):**
 
     -   **[q4_transition_scores_analysis.ipynb](q4_transition_scores_analysis.ipynb)**
-        <sub>_Ноутбук демонстрирует: batch-обработку видео через HuggingFace API, расчёт transition scores, графики зависимости вероятностей от параметров атаки._</sub>
+        <sub>_Demonstrates: batch video processing via the HuggingFace API, transition-score computation, plots of probability against attack parameters._</sub>
 
--   **Автоматизация обработки видео:**
+-   **Video-processing automation:**
 
     -   **[q4_video_batch_processing.ipynb](q4_video_batch_processing.ipynb)**
-        <sub>_Ноутбук содержит: класс VideoProcessor для batch-обработки, конфигурируемые маски кадров, обработку датасетов dzen и tiktok._</sub>
+        <sub>_Contains: the `VideoProcessor` class for batch processing, configurable frame masks, handling of the Dzen and TikTok datasets._</sub>
 
 </details>
 
-### Быстрая ссылка на основные результаты этапа
+### Quick links to the main results of this stage
 
--   ▶️ [Комплексное тестирование и Perplexity (llava_ppy_comprehensive_testing.ipynb)](llava_ppy_comprehensive_testing.ipynb)
--   ▶️ [Анализ transition scores (q4_transition_scores_analysis.ipynb)](q4_transition_scores_analysis.ipynb)
--   ▶️ [Batch-обработка видео (q4_video_batch_processing.ipynb)](q4_video_batch_processing.ipynb)
+-   ▶️ [Comprehensive testing and Perplexity (llava_ppy_comprehensive_testing.ipynb)](llava_ppy_comprehensive_testing.ipynb)
+-   ▶️ [Transition-score analysis (q4_transition_scores_analysis.ipynb)](q4_transition_scores_analysis.ipynb)
+-   ▶️ [Batch video processing (q4_video_batch_processing.ipynb)](q4_video_batch_processing.ipynb)
 
-### Визуализации результатов (извлечены из ноутбуков)
+### Result visualisations (extracted from the notebooks)
 
-| Файл | Описание |
-|------|----------|
-| [histogram_acc1_acc5_all_classes.png](imgs/q4_results/histogram_acc1_acc5_all_classes.png) | Гистограмма acc@1 и acc@5 для всех классов патчей |
-| [perplexity_5classes_llava_v1.5.png](imgs/q4_results/perplexity_5classes_llava_v1.5.png) | Perplexity для 5 классов атак |
-| [token_prob_cake_05b_vs_7b.png](imgs/q4_results/token_prob_cake_05b_vs_7b.png) | Сравнение моделей 0.5b vs 7b |
-| [video_frame_with_patch.png](imgs/q4_results/video_frame_with_patch.png) | Пример видеокадра с патчем |
+| File | Description |
+|------|-------------|
+| [histogram_acc1_acc5_all_classes.png](imgs/q4_results/histogram_acc1_acc5_all_classes.png) | Histogram of acc@1 and acc@5 across all patch classes |
+| [perplexity_5classes_llava_v1.5.png](imgs/q4_results/perplexity_5classes_llava_v1.5.png) | Perplexity across the 5 attack classes |
+| [token_prob_cake_05b_vs_7b.png](imgs/q4_results/token_prob_cake_05b_vs_7b.png) | Comparison of the 0.5B and 7B models |
+| [video_frame_with_patch.png](imgs/q4_results/video_frame_with_patch.png) | Example of a video frame carrying a patch |
 
 ---
 
-<h2 id="summary">Итоговая сводка: Состояние области Adversarial-атак и защит на MLLMs (2022–2025)</h2>
+<h2 id="summary">Summary: the state of adversarial attacks and defences on MLLMs (2022–2025)</h2>
 
-> **Контекст исследования:**
+> **Research context:**
 >
-> -   Мультимодальные модели (MLLMs) лежат в основе многих современных AI-приложений, но их уязвимость к состязательным атакам остается серьезной проблемой.
-> -   Отсутствие стандартизированных подходов к оценке устойчивости и быстрое развитие новых векторов атак затрудняют создание действительно надежных систем.
-> -   Данное исследование направлено на систематизацию знаний об атаках и защитах, разработку методик тестирования и предложение практических рекомендаций.
+> -   Multimodal models (MLLMs) underpin many current AI applications, but their vulnerability to adversarial attacks remains a serious problem.
+> -   The absence of standardised robustness evaluation, combined with the rapid emergence of new attack vectors, makes genuinely reliable systems hard to build.
+> -   This research systematises knowledge about attacks and defences, develops testing methodologies, and proposes practical recommendations.
 
 <details>
-<summary><strong>🗂️ Сводная таблица по типам атак и защит</strong></summary>
+<summary><strong>🗂️ Summary table of attack and defence types</strong></summary>
 
-| Тип атаки/защиты        | Примеры/Методы                       | Характеристика         | Целевые модели/Уязвимость  | Статус защиты/Ограничения                                |
-| ----------------------- | ------------------------------------ | ---------------------- | -------------------------- | -------------------------------------------------------- |
-| **Атаки**               |                                      |                        |                            |                                                          |
-| Patch/UAP/Physical      | Универсальные/таргет. патчи, физ.    | Эффективны, переносимы | CLIP, LLaVA, BLIP, etc.    | Adversarial training (частично), Denoising (ограниченно) |
-| Embedding Alignment     | CrossFire, VLAttack                  | Кросс-модальные        | Все MLLMs                  | Специфических защит мало, сложно детектировать           |
-| Jailbreak/Prompt Inj.   | Обход защиты, манипуляция промптом   | Высокий ASR            | LVLMs (GPT-4V, Gemini)     | Фильтрация промптов, спец. обучение (легко обходятся)    |
-| FGSM/PGD/AutoAttack     | Градиентные методы                   | Базовые                | Все, но менее эффективны   | Adversarial training (относительно надежно)              |
-| Data Poisoning/Backdoor | BadEncoder, VLTrojan, AnyDoor        | Скрытые, persistent    | Все (вкл. pre-trained)     | Сложное обнаружение, unlearning (исследуется)            |
-| Physical attacks        | Реальные объекты/сцены               | Угроза безопасности    | Автономные системы, роботы | Практически нет надежных защит в реальном мире           |
-| Экзотика                | MAA, CAD, FAP, Con Instruction       | Новые векторы          | Различные                  | Защиты разрабатываются / отсутствуют                     |
-| **Защиты**              |                                      |                        |                            |                                                          |
-| Adversarial Training    | Обучение на атаках                   | Повышает робастность   | ---                        | Снижение точности, уязвимость к новым атакам             |
-| Input Transformation    | Denoising, Feature Squeezing         | Предобработка          | ---                        | Снижение точности, обходится адаптивными атаками         |
-| Detection Mechanisms    | Обнаружение аномалий/атак            | Идентификация          | ---                        | Обходится адаптивными атаками, ложные срабатывания       |
-| Robust Architectures    | Использование устойчивых компонентов | Дизайн модели          | ---                        | Сложность разработки, не универсальны                    |
-| Ensemble Methods        | Комбинация моделей/защит             | Усложнение атаки       | ---                        | Повышенные ресурсы, не гарантирует защиту                |
+| Attack / defence type   | Examples and methods                  | Characteristics          | Target models / vulnerability | Defence status and limitations                            |
+| ----------------------- | ------------------------------------- | ------------------------ | ----------------------------- | --------------------------------------------------------- |
+| **Attacks**             |                                       |                          |                               |                                                           |
+| Patch / UAP / physical  | Universal and targeted patches, physical | Effective, transferable | CLIP, LLaVA, BLIP, etc.       | Adversarial training (partial), denoising (limited)       |
+| Embedding alignment     | CrossFire, VLAttack                   | Cross-modal              | All MLLMs                     | Few specific defences, hard to detect                     |
+| Jailbreak / prompt inj. | Safety bypass, prompt manipulation    | High ASR                 | LVLMs (GPT-4V, Gemini)        | Prompt filtering, targeted training (easily bypassed)     |
+| FGSM / PGD / AutoAttack | Gradient methods                      | Baseline                 | All, but less effective       | Adversarial training (relatively reliable)                |
+| Data poisoning / backdoor | BadEncoder, VLTrojan, AnyDoor       | Hidden, persistent       | All, including pretrained     | Hard to detect; unlearning under research                 |
+| Physical attacks        | Real objects and scenes               | Safety threat            | Autonomous systems, robots    | Practically no reliable real-world defences               |
+| Exotic                  | MAA, CAD, FAP, Con Instruction        | New vectors              | Various                       | Defences under development or absent                      |
+| **Defences**            |                                       |                          |                               |                                                           |
+| Adversarial training    | Training on attacks                   | Raises robustness        | ---                           | Accuracy loss, vulnerable to new attacks                  |
+| Input transformation    | Denoising, feature squeezing          | Preprocessing            | ---                           | Accuracy loss, bypassed by adaptive attacks               |
+| Detection mechanisms    | Anomaly / attack detection            | Identification           | ---                           | Bypassed by adaptive attacks, false positives             |
+| Robust architectures    | Use of robust components              | Model design             | ---                           | Hard to build, not universal                              |
+| Ensemble methods        | Combining models or defences          | Raises attack cost       | ---                           | Higher resource cost, no guarantee                        |
 
 </details>
 
 <details>
-<summary><strong>📋 Ключевые тезисы по состоянию области</strong></summary>
+<summary><strong>📋 Key theses on the state of the field</strong></summary>
 
--   **Уязвимость MLLM:** Современные мультимодальные модели фундаментально уязвимы к широкому спектру состязательных атак, особенно к патчам, UAP, jailbreak и кросс-модальным манипуляциям.
--   **Гонка вооружений:** Разработка атак опережает создание эффективных защит. Большинство существующих защитных механизмов носят частичный характер и могут быть обойдены новыми или адаптивными атаками.
--   **Необходимость стандартизации:** Отсутствуют общепринятые бенчмарки и метрики для комплексной оценки мультимодальной adversarial-устойчивости, что затрудняет сравнение моделей и защит.
--   **Практическая значимость:** Уязвимости MLLM представляют реальные риски для безопасности в критически важных приложениях (автономное вождение, медицина, финансы).
--   **Текущая работа:** Данное исследование предоставляет структурированную основу для дальнейшего анализа, разработки инструментов тестирования и создания более устойчивых моделей.
+-   **MLLM vulnerability:** current multimodal models are fundamentally vulnerable to a wide range of adversarial attacks, particularly patches, UAP, jailbreak and cross-modal manipulation.
+-   **Arms race:** attack development outpaces the creation of effective defences. Most existing defence mechanisms are partial and can be bypassed by new or adaptive attacks.
+-   **Need for standardisation:** there are no commonly accepted benchmarks or metrics for comprehensive multimodal adversarial-robustness evaluation, which makes models and defences hard to compare.
+-   **Practical significance:** MLLM vulnerabilities pose real safety risks in critical applications such as autonomous driving, medicine and finance.
+-   **This work:** provides a structured basis for further analysis, for building testing tools, and for creating more robust models.
 
 </details>
 
 <details>
-<summary><strong>🔎 Детали исследования и ссылки</strong></summary>
+<summary><strong>🔎 Research details and links</strong></summary>
 
--   Проведен систематический анализ и классификация adversarial-атак по ключевым параметрам: фаза жизненного цикла модели (обучение/инференс), цель атаки (классификация, генерация, jailbreak), модальность (уни-/мульти-), уровень доступа атакующего (white/gray/black-box).
--   Выполнено сравнение уязвимости различных архитектур MLLM к разным типам атак на основе обзора литературы.
--   Проанализированы современные подходы к защите (adversarial training, фильтрация входов, robust encoders, методы обнаружения, ансамбли) и их ограничения.
--   Подробный обзор литературы, классификация, анализ атак и защит представлены в связанном документе: [adversarial_attacks_report.md](adversarial_attacks_report.md)
+-   Carried out a systematic analysis and classification of adversarial attacks along key axes: model lifecycle phase (training/inference), attack goal (classification, generation, jailbreak), modality (uni-/multi-), and attacker access level (white/gray/black-box).
+-   Compared the vulnerability of different MLLM architectures to different attack types based on the literature review.
+-   Analysed current defence approaches (adversarial training, input filtering, robust encoders, detection methods, ensembles) and their limitations.
+-   The detailed literature review, classification and analysis of attacks and defences are in the companion document: [adversarial_attacks_report.md](adversarial_attacks_report.md)
 
 </details>
 
