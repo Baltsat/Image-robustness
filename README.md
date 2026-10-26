@@ -1,8 +1,58 @@
-# Image-robustness: adversarial robustness of multimodal models — research plan and reports
+<div align="center">
 
-Adversarial attacks on multimodal LLMs (CLIP, LLaVA family), measured end to end: attack generation, Attack Success Rate, cross-implementation generalisation, validation on 200+ real social-media videos, and a token-probability method for detecting attacks.
+# Image-robustness
 
-**Headline results:** ASR 7%–26.5% on LLaVA OneVision · 5 model architectures × 5 patch classes × 10 intensity levels · acc@1 46%–87%, acc@5 88%–100% · transition-score detection over a 37.11%–100.00% token-probability range.
+### Adversarial patches against multimodal LLMs — attack, measure, detect
+
+**Eugene Kaspersky Scholarship research project · 2025**
+
+[![Kaspersky Scholarship](https://img.shields.io/badge/Eugene%20Kaspersky%20Scholarship-winner%202024-006d5c)](#about)
+[![Models](https://img.shields.io/badge/models-CLIP%20·%20LLaVA%201.5%20·%20LLaVA%20OneVision-4b5563)](#repository-map)
+[![Stages](https://img.shields.io/badge/research%20stages-4%2F4%20complete-2ea44f)](#roadmap2025)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+<img src="imgs/q4_results/video_frame_with_patch.png" width="640" alt="Video frame with an adversarial patch injected">
+
+</div>
+
+A small printed-looking square in the corner of a video frame can make a vision-language model describe a scene that is not there. This project builds such patches, measures how often they work, checks that they transfer across model implementations and real social-media video, and tests a cheap way to spot them from the model's own token probabilities.
+
+<h2 id="about">About</h2>
+
+The work was carried out under the **Eugene Kaspersky Scholarship**, awarded by [Kaspersky](https://www.kaspersky.com/) together with the «Sintez» programme and the Gennady Komissarov Foundation for Young Scientists (diploma dated 10 December 2024). The scholarship funded one year of research in four quarterly stages; each stage below ends with its own report.
+
+## Results at a glance
+
+| | Result |
+|---|---|
+| Attack success | **ASR 7% – 26.5%** on LLaVA OneVision, depending on patch strength (N = 1…10) |
+| Scale of the test grid | **5 model architectures × 5 patch classes × 10 intensity levels** |
+| Classification under attack | **acc@1 46% – 87%**, **acc@5 88% – 100%** across patch classes |
+| Transfer | the same patches work through an independent LLaVA OneVision implementation (HuggingFace) |
+| Real-world video | validated on **200 videos** from TikTok and Dzen datasets |
+| Detection signal | token-probability (transition-score) analysis, confidence range **37.11% – 100.00%** |
+
+<p align="center">
+  <img src="imgs/q4_results/histogram_acc1_acc5_all_classes.png" width="49%" alt="acc@1 and acc@5 across patch classes">
+  <img src="imgs/q4_results/token_prob_cake_05b_vs_7b.png" width="49%" alt="Token probabilities, 0.5B vs 7B model">
+</p>
+
+## Repository map
+
+| Notebook | What it does |
+|---|---|
+| [`main.ipynb`](main.ipynb) | Patch optimisation against CLIP (open_clip) and transferability checks |
+| [`for_video_fix_names.ipynb`](for_video_fix_names.ipynb) | Patch training on multilingual CLIP, dataset filename clean-up |
+| [`patch_video.ipynb`](patch_video.ipynb) | Inserting patches into single videos and whole video datasets |
+| [`video_datasets_conversion.ipynb`](video_datasets_conversion.ipynb) | Converting frame dumps into 30 FPS `.mp4` |
+| [`llava_onevision_attacks.ipynb`](llava_onevision_attacks.ipynb) | Attacks on LLaVA OneVision (original implementation) |
+| [`llava_hf_generalization.ipynb`](llava_hf_generalization.ipynb) | Same attacks through the HuggingFace implementation |
+| [`llava_ppy_comprehensive_testing.ipynb`](llava_ppy_comprehensive_testing.ipynb) | Full test grid: architectures × patch classes × intensities |
+| [`q4_video_batch_processing.ipynb`](q4_video_batch_processing.ipynb) | Batch patching of the 200-video validation set |
+| [`q4_transition_scores_analysis.ipynb`](q4_transition_scores_analysis.ipynb) | Transition-score analysis for attack detection |
+| [`adversarial_attacks_report.md`](adversarial_attacks_report.md) | Literature review: attacks and defences on MLLMs, 2022–2025 |
+
+The notebooks were run on Colab GPUs; each one installs its own dependencies in the first cells.
 
 ## Contents
 
